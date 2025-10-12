@@ -1,0 +1,20 @@
+version: "3"
+services:
+  elasticsearch:
+    image: 'elasticsearch:9.0.2'
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    environment:
+      - "discovery.type=single-node"
+      - "cluster.name=elasticsearch"
+    volumes:
+      - D:\program\docker\data\elashticsearch\data:/usr/share/elasticsearch/data
+      - D:\program\docker\data\elashticsearch\config:/usr/share/elasticsearch/config
+      - D:\program\docker\data\elashticsearch\plugins:/usr/share/elasticsearch/plugins
+  kibana:
+    image: 'kibana:9.0.4'
+    ports:
+      - 8888:5601
+    volumes:
+      - D:\program\docker\data\kibana\config:/usr/share/kibana/config
