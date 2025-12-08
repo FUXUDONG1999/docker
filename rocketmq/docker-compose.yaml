@@ -12,8 +12,8 @@ services:
     ports:
       - "9876:9876"
     volumes:
-      - ./data/namesrv/logs:/root/data/rocketmq/logs
-      - ./data/namesrv/store:/root/data/rocketmq/store
+      - /root/data/rocketmq/logs:/home/rocketmq/logs
+      - /root/data/rocketmq/store:/home/rocketmq/store
     environment:
       - MAX_HEAP_SIZE=4G
       - HEAP_NEWSIZE=4G
@@ -31,16 +31,16 @@ services:
       - "10911:10911"
       - "10912:10912"
     volumes:
-      - ./data/broker/logs:/root/data/rocketmq/logs
-      - ./data/broker/store:/root/data/rocketmq/store
-      - ./conf/broker.conf:/root/data/rocketmq/conf/broker.conf
+      - /root/data/rocketmq/logs:/home/rocketmq/logs
+      - /root/data/rocketmq/store:/home/rocketmq/store
+      - /root/data/rocketmq/conf/broker.conf:/home/rocketmq/rocketmq-5.1.0/conf/broker.conf
     environment:
       - NAMESRV_ADDR=namesrv:9876
     depends_on:
       - namesrv
     networks:
       - rocketmq-net
-    command: sh mqbroker -c /root/data/rocketmq/conf/broker.conf
+    command: sh mqbroker -c /home/rocketmq/rocketmq-5.1.0/conf/broker.conf
 
   console:
     image: apacherocketmq/rocketmq-dashboard:latest
