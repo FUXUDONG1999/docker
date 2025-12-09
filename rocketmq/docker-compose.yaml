@@ -12,8 +12,8 @@ services:
     ports:
       - "9876:9876"
     volumes:
-      - /root/data/rocketmq/logs:/home/rocketmq/logs
-      - /root/data/rocketmq/store:/home/rocketmq/store
+      - /root/data/rocketmq/namesrv/logs:/root/logs
+      - /root/data/rocketmq/namesrv/store:/root/store
     environment:
       - MAX_HEAP_SIZE=4G
       - HEAP_NEWSIZE=4G
@@ -31,8 +31,8 @@ services:
       - "10911:10911"
       - "10912:10912"
     volumes:
-      - /root/data/rocketmq/logs:/home/rocketmq/logs
-      - /root/data/rocketmq/store:/home/rocketmq/store
+      - /root/data/rocketmq/broker/logs:/root/logs
+      - /root/data/rocketmq/broker/store:/root/store
       - /root/data/rocketmq/conf/broker.conf:/home/rocketmq/rocketmq-5.1.0/conf/broker.conf
     environment:
       - NAMESRV_ADDR=namesrv:9876
@@ -42,13 +42,29 @@ services:
       - rocketmq-net
     command: sh mqbroker -c /home/rocketmq/rocketmq-5.1.0/conf/broker.conf
 
+  proxy:
+    image: apache/rocketmq:5.1.0
+    container_name: rocketmq-proxy
+    ports:
+      - "8083:8080"
+      - "8081:8081"
+    environment:
+      - NAMESRV_ADDR=namesrv:9876
+    depends_on:
+      - broker
+      - namesrv
+    networks:
+      - rocketmq-net
+    restart: on-failure
+    command: sh mqproxy
+
   console:
     image: apacherocketmq/rocketmq-dashboard:latest
     container_name: rocketmq-console
     ports:
       - "8082:8082"
     environment:
-      - JAVA_OPTS=-Drocketmq.namesrv.addr=9.135.33.28:9876
+      - JAVA_OPTS=-Drocketmq.namesrv.addr=namesrv:9876
     depends_on:
       - namesrv
       - broker
