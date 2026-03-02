@@ -18,8 +18,11 @@ services:
       - PULSAR_MEM=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
     networks:
       - pulsar-net
+    user: "0:0"
     command: >
-      bash -c "bin/apply-config-from-env.py conf/zookeeper.conf &&
+      bash -c "chown -R 10000:0 /pulsar/data/zookeeper &&
+      chmod -R 775 /pulsar/data/zookeeper &&
+      bin/apply-config-from-env.py conf/zookeeper.conf &&
       bin/generate-zookeeper-config.sh conf/zookeeper.conf &&
       exec bin/pulsar zookeeper"
     healthcheck:
@@ -66,7 +69,12 @@ services:
         condition: service_completed_successfully
     networks:
       - pulsar-net
-    command: bash -c "bin/apply-config-from-env.py conf/bookkeeper.conf && exec bin/pulsar bookie"
+    user: "0:0"
+    command: >
+      bash -c "chown -R 10000:0 /pulsar/data/bookkeeper &&
+      chmod -R 775 /pulsar/data/bookkeeper &&
+      bin/apply-config-from-env.py conf/bookkeeper.conf &&
+      exec bin/pulsar bookie"
     healthcheck:
       test: [ "CMD", "bin/bookkeeper", "shell", "bookiesanity" ]
       interval: 10s
@@ -99,7 +107,12 @@ services:
         condition: service_healthy
     networks:
       - pulsar-net
-    command: bash -c "bin/apply-config-from-env.py conf/broker.conf && exec bin/pulsar broker"
+    user: "0:0"
+    command: >
+      bash -c "chown -R 10000:0 /pulsar/logs &&
+      chmod -R 775 /pulsar/logs &&
+      bin/apply-config-from-env.py conf/broker.conf &&
+      exec bin/pulsar broker"
     healthcheck:
       test: [ "CMD", "bin/pulsar-admin", "brokers", "healthcheck" ]
       interval: 10s
